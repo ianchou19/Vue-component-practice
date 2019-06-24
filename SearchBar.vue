@@ -4,8 +4,8 @@
       <input
         :class="{ typed: isType, }"
         class="SearchBarInput"
-        type="text"
         :placeholder="placeholder"
+        v-model="inputText"
         @input="inputChange"
         @keydown="inputKeyDown"
       >
@@ -14,7 +14,7 @@
           :class="{ typed: isClick, }"
           class="crossImgNormal"
           src="/delete_icon_search_field_normal.svg"
-          @click="cleanInput"
+          @click="crossClick"
         >
         <img
           :class="{ typed: isClick, }"
@@ -38,120 +38,138 @@
     </div>
     <div :class="{ typed: isType, }" class="autocompleteContainer">
       <li
-        v-for="amd_item in autocomplete_mock_data"
+        v-for="amd_item in autocomplete_data"
         class="autoCompListItem"
+        :class="{ selected: selectedState[amd_item.id]}"
         :id="amd_item.id"
         style="list-style-type:none;"
         @click="liClick"
-      >
-{{ amd_item.content }}
-</li>
+      >{{ amd_item.content }}</li>
     </div>
   </div>
 </template>
 
 <script>
-import jQuery from 'jquery'
-const $ = jQuery
-
 export default {
-  props: {
-    placeholder: {
-      type: String,
-      default: 'Search for brand, style...etc'
-    }
-  },
-  data: function () {
+  data: function() {
     return {
       isType: false,
       isClick: false,
-      defaultValue: '',
-      autocomplete_mock_data: {
+      inputText: "",
+      placeholder: "Search for brand, style...etc",
+      selectedState: {},
+      autocomplete_data: {
         fakeData_1: {
-          id: 'item_1',
-          content: 'apple'
+          id: "item_1",
+          content: "apple"
         },
         fakeData_2: {
-          id: 'item_2',
-          content: 'apple farmer'
+          id: "item_2",
+          content: "apple farmer"
         },
         fakeData_3: {
-          id: 'item_3',
-          content: 'apple is delicious'
+          id: "item_3",
+          content: "apple is delicious"
         },
         fakeData_4: {
-          id: 'item_4',
-          content: 'apple apple apple!'
+          id: "item_4",
+          content: "apple apple apple!"
         },
         fakeData_5: {
-          id: 'item_5',
-          content: 'apple can save your life'
+          id: "item_5",
+          content: "apple can save your life"
         }
       }
-    }
+    };
   },
   methods: {
-    inputChange: function (item) {
-      if (item.target.value !== '') {
+    inputChange: function(item) {
+      if (item.target.value !== "") {
         if (!this.isType) {
-          this.isType = true
+          this.isType = true;
         }
       } else if (this.isType) {
-          this.isType = false
+        this.isType = false;
+      }
+
+      for (var auto_item in this.autocomplete_data) {
+        this.selectedState[this.autocomplete_data[auto_item].id] = false;
+      }
+    },
+    inputKeyDown: function(item) {
+      if (item.key === "ArrowDown") {
+        this.moveSelection("down");
+      } else if (item.key === "ArrowUp") {
+        this.moveSelection("up");
+      } else if (item.key === "Enter") {
+        this.onSearch();
+      }
+    },
+    liClick: function(item) {
+      for (var auto_item in this.selectedState) {
+        this.selectedState[auto_item] = false;
+      }
+      this.selectedState[item.target.id] = true;
+      this.inputText = item.target.innerText;
+      this.onSearch();
+    },
+    moveSelection: function(direction) {
+      // block the Key operation when autocomplete sction is closed
+      if (!this.isType) return;
+
+      if (direction === "up") {
+        direction = -1;
+      } else if (direction === "down") {
+        direction = 1;
+      }
+
+      var flag = false;
+      var selected_item;
+      for (var auto_item in this.selectedState) {
+        // check if exists any selected autocomplete item
+        if (this.selectedState[auto_item]) {
+          flag = true;
+          selected_item = auto_item;
+          break;
         }
-    },
-    inputKeyDown: function (item) {
-      if (item.key === 'ArrowDown') {
-        this.moveSelection('down')
-      } else if (item.key === 'ArrowUp') {
-        this.moveSelection('up')
-      } else if (item.key === 'Enter') {
-        this.onSearch()
-      }
-    },
-    liClick: function (item) {
-      $('.autoCompListItem.selected').removeClass('selected')
-      let selector = '#' + item.target.id
-      $(selector).addClass('selected')
-      $('.SearchBarInput')[0].value = item.target.innerText
-      this.onSearch()
-    },
-    moveSelection: function (direction) {
-      if (direction === 'up') {
-        direction = -1
-      } else if (direction === 'down') {
-        direction = 1
       }
 
-      if (!$('.autoCompListItem').hasClass('selected')) {
-        var selector = '#item_1'
-        $(selector).addClass('selected')
+      if (!flag) {
+        selected_item = "item_1";
+        this.selectedState[selected_item] = true; // when no autocomplete item has been selected
       } else {
-        var selector = '#' + $('.autoCompListItem.selected').attr('id')
-        $(selector).removeClass('selected')
-        var selector =
-          selector.slice(0, -1) +
-          (parseInt(selector.slice(-1)) + direction).toString()
-        $(selector).addClass('selected')
+        var new_position = parseInt(selected_item.slice(-1)) + direction;
+        var total_auto_item = Object.keys(this.selectedState).length;
+
+        // restrict the movement only between uppest and lowest autocomplete item
+        if (new_position > 0 && new_position <= total_auto_item) {
+          this.selectedState[selected_item] = false;
+          selected_item = selected_item.slice(0, -1) + new_position.toString();
+          this.selectedState[selected_item] = true;
+        }
       }
 
-      if ($(selector)[0] !== undefined) {
-        $('.SearchBarInput').val($(selector)[0].innerHTML)
+      for (var data_item in this.autocomplete_data) {
+        if (this.autocomplete_data[data_item].id === selected_item) {
+          // add the content of selected item into the Input element
+          this.inputText = this.autocomplete_data[data_item].content;
+          break;
+        }
       }
     },
-    onSearch: function () {
-      console.log('on search!')
-      this.isType = false
+    onSearch: function() {
+      console.log("on search!");
+      this.isType = false;
     },
-    cleanInput: function (item) {
-      $('.SearchBarInput')[0].value = ''
-      this.isType = false
+    crossClick: function(item) {
+      this.inputText = "";
+      this.isType = false;
     },
-    magnifierClick: function () {
-      this.onSearch()
+    magnifierClick: function() {
+      this.onSearch();
     }
   }
-}
+};
 </script>
 
 <style>
@@ -165,7 +183,7 @@ export default {
 }
 
 .SearchBarInput {
-  width: 700px;
+  width: 588px;
   opacity: 0.8;
   border: solid 1px #d2af2c;
   border-bottom: solid 2px #d2af2c;
@@ -187,7 +205,7 @@ export default {
 }
 
 .cross {
-  height: 47px;
+  /* height: 47px; */
   border-top: solid 1px #d2af2c;
   border-right: solid 1px #d2af2c;
   border-bottom: solid 2px #d2af2c;
@@ -195,7 +213,7 @@ export default {
 }
 
 .crossImgNormal {
-  padding: 14px 20px 0 20px;
+  padding: 13px 20px 0 20px;
 }
 
 .crossImgNormal.typed {
@@ -203,7 +221,7 @@ export default {
 }
 
 .crossImgClicked {
-  padding: 14px 20px 0 20px;
+  padding: 13px 20px 0 20px;
 }
 
 .crossImgClicked:not(.typed) {
@@ -211,8 +229,8 @@ export default {
 }
 
 .magnifier {
-  width: 62px;
-  height: 47px;
+  width: 72px;
+  /* height: 47px; */
   border-top: solid 1px #d2af2c;
   border-right: solid 1px #d2af2c;
   border-bottom: solid 2px #d2af2c;
@@ -220,7 +238,7 @@ export default {
 }
 
 .magnifierImgNormal {
-  padding: 14px 20px 0 20px;
+  padding: 13px 0 0 25px;
 }
 
 .magnifierImgNormal.typed {
@@ -228,7 +246,7 @@ export default {
 }
 
 .magnifierImgClicked {
-  padding: 12px 20px 0 20px;
+  padding: 13px 20px 0 20px;
 }
 
 .magnifierImgClicked:not(.typed) {
@@ -262,7 +280,7 @@ export default {
 }
 
 .autoCompListItem.selected {
-  background: #5f5f5f;
+  background: #333333;
   cursor: pointer;
 }
 </style>
