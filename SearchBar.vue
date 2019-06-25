@@ -44,6 +44,7 @@
         :id="amd_item.id"
         style="list-style-type:none;"
         @click="liClick"
+        @mouseover="liMouseOver"
       >{{ amd_item.content }}</li>
     </div>
   </div>
@@ -112,6 +113,17 @@ export default {
       this.selectedState[item.target.id] = true;
       this.inputText = item.target.innerText;
       this.onSearch();
+    },
+    liMouseOver: function(item) {
+      for (var auto_item in this.selectedState) {
+        // check if exists any selected autocomplete item
+        if (this.selectedState[auto_item]) {
+          this.selectedState[auto_item] = false;
+          break;
+        }
+      }
+      this.selectedState[item.target.id] = true;
+      this.inputText = item.target.innerText;
     },
     moveSelection: function(direction) {
       // block the Key operation when autocomplete sction is closed
@@ -196,16 +208,15 @@ export default {
   font-stretch: normal;
   line-height: normal;
   letter-spacing: normal;
-  color: rgba(230, 230, 230, 0.7);
   padding: 13px 0 14px 25px;
-}
-
-.SearchBarInput.typed {
   color: #ffffff;
 }
 
+::placeholder {
+  color: rgba(230, 230, 230, 0.7);
+}
+
 .cross {
-  /* height: 47px; */
   border-top: solid 1px #d2af2c;
   border-right: solid 1px #d2af2c;
   border-bottom: solid 2px #d2af2c;
@@ -230,7 +241,6 @@ export default {
 
 .magnifier {
   width: 72px;
-  /* height: 47px; */
   border-top: solid 1px #d2af2c;
   border-right: solid 1px #d2af2c;
   border-bottom: solid 2px #d2af2c;
