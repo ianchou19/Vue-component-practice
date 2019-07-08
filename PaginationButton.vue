@@ -1,12 +1,12 @@
 <template>
   <div class="pagination">
     <div class="left_arrow">
-      <ArrowButtonLeft @clickLeftArrow="decreasePage"/>
+      <ArrowButtonLeft @clickLeftArrow="decreasePage" />
     </div>
     <label class="page_info page_pre">{{ page_prefix }}</label>
     <label class="page_info page_num">{{ page_num }}</label>
     <div class="right_arrow">
-      <ArrowButtonRight @clickRightArrow="increasePage"/>
+      <ArrowButtonRight @clickRightArrow="increasePage" />
     </div>
   </div>
 </template>
@@ -22,7 +22,7 @@ export default {
   },
   props: {
     page_num: {
-      defualt: 1
+      default: 1
     }
   },
   data: function() {
@@ -43,10 +43,19 @@ export default {
 
 <style>
 .pagination {
-  width: 400px;
   display: flex;
   justify-content: center;
   align-items: center;
+}
+
+.left_arrow {
+  width: 40px;
+  height: 40px;
+}
+
+.right_arrow {
+  width: 40px;
+  height: 40px;
 }
 
 .page_info {
@@ -67,5 +76,15 @@ export default {
 
 .page_num {
   padding: 0 44px 0 0;
+}
+
+.left_arrow {
+  width: 40px;
+  height: 40px;
+}
+
+.right_arrow {
+  width: 40px;
+  height: 40px;
 }
 </style>
