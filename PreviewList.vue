@@ -1,5 +1,5 @@
 <template>
-  <div class="preview_list">
+  <div>
     <div class="title_row">
       <div class="col_title" :class="col.type" v-for="col in col_settings">{{col.title}}</div>
     </div>
@@ -7,7 +7,7 @@
       v-for="(dist,index) in distinction"
       v-if="index >= data_start_index && index < (data_start_index + page_size)"
     >
-      <PreviewListRow class="PreviewListRow" :product="dist"/>
+      <PreviewListRow class="PreviewListRow" :product="dist" />
     </div>
   </div>
 </template>
@@ -27,7 +27,7 @@ export default {
       type: Array
     },
     page_size: {
-      default: 1000
+      default: 100
     },
     data_start_index: {
       default: 0
@@ -55,21 +55,21 @@ export default {
   word-wrap: break-word;
 }
 
-/* .col_title.heart {
-  width: 30%;
+.col_title.heart {
+  width: 130px;
 }
 
 .col_title.image {
-  width: 30%;
+  width: 180px;
 }
 
 .col_title.text {
-  width: 30%;
+  width: 250px;
 }
 
 .col_title.button {
-  width: 30%;
-} */
+  width: 180px;
+}
 
 .PreviewListRow {
   border-bottom: solid 1px #e6e6e6;
