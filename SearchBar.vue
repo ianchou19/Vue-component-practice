@@ -1,42 +1,39 @@
 <template>
-  <div class="searchContainer">
+  <div class="searchWholeContainer">
     <div class="searchBarContainer">
       <input
-        :class="{ typed: isType, }"
         class="SearchBarInput"
+        :class="{ typed: isType}"
         :placeholder="placeholder"
         v-model="inputText"
         @input="inputChange"
         @keydown="inputKeyDown"
-      >
+      />
       <div class="cross">
         <img
-          :class="{ typed: isClick, }"
           class="crossImgNormal"
+          :class="{typed: isType2}"
           src="/delete_icon_search_field_normal.svg"
           @click="crossClick"
-        >
-        <img
-          :class="{ typed: isClick, }"
-          class="crossImgClicked"
-          src="/delete_icon_search_field_clicked.svg"
-        >
+        />
+        <img class="crossImgClicked" src="/delete_icon_search_field_clicked.svg" />
       </div>
+      <div class="vertical_line"></div>
       <div class="magnifier">
         <img
-          :class="{ typed: isClick, }"
           class="magnifierImgNormal"
+          :class="{ clicked: isClick}"
           src="/search_icon_search_field_normal.svg"
           @click="magnifierClick"
-        >
+        />
         <img
-          :class="{ typed: isClick, }"
           class="magnifierImgClicked"
+          :class="{ clicked: isClick}"
           src="/search_icon_search_field_hover_and_clicked.svg"
-        >
+        />
       </div>
     </div>
-    <div :class="{ typed: isType, }" class="autocompleteContainer">
+    <div class="autocompleteContainer" :class="{ typed: isType, }">
       <li
         v-for="amd_item in autocomplete_data"
         class="autoCompListItem"
@@ -52,35 +49,22 @@
 
 <script>
 export default {
+  props: {
+    autocomplete_data: {
+      type: Object
+    },
+    placeholder: {
+      type: String,
+      default: "Search for brand, style...etc"
+    }
+  },
   data: function() {
     return {
       isType: false,
+      isType2: false, // isType2 is for the cross icon only
       isClick: false,
       inputText: "",
-      placeholder: "Search for brand, style...etc",
-      selectedState: {},
-      autocomplete_data: {
-        fakeData_1: {
-          id: "item_1",
-          content: "apple"
-        },
-        fakeData_2: {
-          id: "item_2",
-          content: "apple farmer"
-        },
-        fakeData_3: {
-          id: "item_3",
-          content: "apple is delicious"
-        },
-        fakeData_4: {
-          id: "item_4",
-          content: "apple apple apple!"
-        },
-        fakeData_5: {
-          id: "item_5",
-          content: "apple can save your life"
-        }
-      }
+      selectedState: {}
     };
   },
   methods: {
@@ -88,14 +72,17 @@ export default {
       if (item.target.value !== "") {
         if (!this.isType) {
           this.isType = true;
+          this.isType2 = true;
         }
       } else if (this.isType) {
         this.isType = false;
+        this.isType2 = false;
       }
 
       for (var auto_item in this.autocomplete_data) {
         this.selectedState[this.autocomplete_data[auto_item].id] = false;
       }
+      this.$emit("updateSearchQuery", this.inputText);
     },
     inputKeyDown: function(item) {
       if (item.key === "ArrowDown") {
@@ -172,12 +159,15 @@ export default {
     onSearch: function() {
       console.log("on search!");
       this.isType = false;
+      this.isClick = false;
     },
     crossClick: function(item) {
       this.inputText = "";
       this.isType = false;
+      this.isType2 = false;
     },
     magnifierClick: function() {
+      this.isClick = true;
       this.onSearch();
     }
   }
@@ -185,21 +175,23 @@ export default {
 </script>
 
 <style>
+.searchWholeContainer {
+  position: relative;
+}
+
 .searchBarContainer {
-  width: 723px;
   height: 50px;
-  opacity: 0.8;
-  border: solid 1px #d2af2c;
-  background-color: #333333;
   display: flex;
+  opacity: 0.8;
+  border: solid 2px #d2af2c;
+  background-color: #333333;
+  text-align: center;
 }
 
 .SearchBarInput {
-  width: 588px;
+  width: 84%;
   opacity: 0.8;
-  border: solid 1px #d2af2c;
-  border-bottom: solid 2px #d2af2c;
-  border-right-color: #333333;
+  border: none;
   background-color: #333333;
   font-family: Muli;
   font-size: 18.4px;
@@ -208,64 +200,63 @@ export default {
   font-stretch: normal;
   line-height: normal;
   letter-spacing: normal;
-  padding: 13px 0 14px 25px;
+  padding: 12px 0 14px 25px;
   color: #ffffff;
+  outline: none;
 }
 
-::placeholder {
+.SearchBarInput::placeholder {
   color: rgba(230, 230, 230, 0.7);
 }
 
 .cross {
-  border-top: solid 1px #d2af2c;
-  border-right: solid 1px #d2af2c;
-  border-bottom: solid 2px #d2af2c;
+  width: 8%;
   cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.crossImgNormal {
-  padding: 13px 20px 0 20px;
-}
-
-.crossImgNormal.typed {
+.crossImgNormal:not(.typed) {
   display: none;
 }
 
-.crossImgClicked {
-  padding: 13px 20px 0 20px;
+.crossImgNormal.clicked {
+  display: none;
 }
 
-.crossImgClicked:not(.typed) {
+.crossImgClicked:not(.clicked) {
   display: none;
+}
+
+.vertical_line {
+  margin-top: auto;
+  margin-bottom: auto;
+  border-right: solid 2px #d2af2c;
+  height: 75%;
 }
 
 .magnifier {
-  width: 72px;
-  border-top: solid 1px #d2af2c;
-  border-right: solid 1px #d2af2c;
-  border-bottom: solid 2px #d2af2c;
+  width: 8%;
   cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.magnifierImgNormal {
-  padding: 13px 0 0 25px;
-}
-
-.magnifierImgNormal.typed {
+.magnifierImgNormal.clicked {
   display: none;
 }
 
-.magnifierImgClicked {
-  padding: 13px 20px 0 20px;
-}
-
-.magnifierImgClicked:not(.typed) {
+.magnifierImgClicked:not(.clicked) {
   display: none;
 }
 
 .autocompleteContainer {
-  width: 723px;
+  width: 100%;
   background-color: rgba(51, 51, 51, 0.9);
+  position: absolute;
+  z-index: 1;
 }
 
 .autocompleteContainer:not(.typed) {
@@ -274,10 +265,6 @@ export default {
 
 .autoCompListItem {
   color: #ffffff;
-  padding-top: 15px;
-  padding-left: 25px;
-  padding-bottom: 15px;
-  border-bottom: 1px solid #5f5f5f;
   font-family: Muli;
   font-size: 18.4px;
   font-weight: normal;
@@ -287,10 +274,21 @@ export default {
   letter-spacing: normal;
   color: #ffffff;
   cursor: pointer;
+  padding: 1.7% 3.7% 1.7% 3.7%;
+  position: relative;
 }
 
 .autoCompListItem.selected {
   background: #333333;
   cursor: pointer;
+}
+
+.autoCompListItem:after {
+  content: "";
+  position: absolute;
+  width: 95%;
+  bottom: 0%;
+  left: 2.5%;
+  border: 1px solid #5f5f5f;
 }
 </style>
