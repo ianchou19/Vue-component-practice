@@ -1,6 +1,6 @@
 ```vue
 <template>
-  <SearchBar class="temp_style" :autocomplete_data='{
+  <HeaderSearchBar :autocomplete_data='{
     fakeData_1: {
       id: "item_1",
       content: "apple"
@@ -19,13 +19,10 @@
     },
     fakeData_5: {
       id: "item_5",
-      content: "apple can save your life!!!!!"
+      content: "apple can save your life!!!"
     }
-  }'/>
+  }' />
 </template>
 <style>
-.temp_style {
-  width: 723px;
-}
 </style>
 ```
