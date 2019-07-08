@@ -1,16 +1,13 @@
 <template>
-  <div>
-    <div class="top_title">
-      <div id="col_1" class="col_title">{{title.col_1}}</div>
-      <div id="col_2" class="col_title">{{title.col_2}}</div>
-      <div id="col_3" class="col_title">{{title.col_3}}</div>
-      <div id="col_4" class="col_title">{{title.col_4}}</div>
+  <div class="preview_list">
+    <div class="title_row">
+      <div class="col_title" :class="col.type" v-for="col in col_settings">{{col.title}}</div>
     </div>
     <div
       v-for="(dist,index) in distinction"
-      v-if="index >= data_start_index && index < (data_start_index + page_actual_size)"
+      v-if="index >= data_start_index && index < (data_start_index + page_size)"
     >
-      <PreviewListRow :product="dist"/>
+      <PreviewListRow class="PreviewListRow" :product="dist"/>
     </div>
   </div>
 </template>
@@ -24,33 +21,26 @@ export default {
   },
   props: {
     distinction: {
-      type: Object
+      type: Array
+    },
+    col_settings: {
+      type: Array
     },
     page_size: {
-      default: 100
+      default: 1000
+    },
+    data_start_index: {
+      default: 0
     }
-  },
-  data: function() {
-    return {
-      title: {
-        col_1: "Brand/Model",
-        col_2: "Average Price",
-        col_3: "Lowest Price",
-        col_4: "Highest Price"
-      },
-      page_actual_size: this.page_size,
-      data_start_index: 0
-    };
   }
 };
 </script>
 
 <style>
-.top_title {
+.title_row {
   display: flex;
   border-bottom: 1px solid #333333;
   padding: 0 0 33px 0;
-  width: 1320px;
 }
 
 .col_title {
@@ -65,23 +55,23 @@ export default {
   word-wrap: break-word;
 }
 
-#col_1 {
-  width: 660px;
-  padding: 0 40px 0 300px;
+/* .col_title.heart {
+  width: 30%;
 }
 
-#col_2 {
-  width: 220px;
-  padding: 0 30px 0 0;
+.col_title.image {
+  width: 30%;
 }
 
-#col_3 {
-  width: 220px;
-  padding: 0 30px 0 0;
+.col_title.text {
+  width: 30%;
 }
 
-#col_4 {
-  width: 220px;
-  padding: 0 30px 0 0;
+.col_title.button {
+  width: 30%;
+} */
+
+.PreviewListRow {
+  border-bottom: solid 1px #e6e6e6;
 }
 </style>
