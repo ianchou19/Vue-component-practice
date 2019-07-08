@@ -1,39 +1,37 @@
 <template>
-  <div class="topSearchContainer" :class="{ typed: isType, }">
-    <div class="topSearchBarContainer">
-      <input
-        class="topSearchBarInput"
-        :class="{ typed: isType, }"
-        :placeholder="placeholder"
-        v-model="inputText"
-        @input="inputChange"
-        @keydown="inputKeyDown"
-      >
-      <div class="topCross">
-        <img
-          class="topCrossImgNormal"
-          :class="{ typed: isClick, }"
-          src="/delete_icon_top search_field_normal.svg"
-          @click="crossClick"
-        >
-        <img
-          class="topCrossImgClicked"
-          :class="{ typed: isClick, }"
-          src="/delete_icon_top search_field_clicked.svg"
-        >
-      </div>
-      <div class="topMagnifier">
-        <img
-          class="topMagnifierImgNormal"
-          :class="{ typed: isClick, }"
-          src="/search_icon_top_search_field_normal.svg"
-          @click="magnifierClick"
-        >
-        <img
-          class="topMagnifierImgClicked"
-          :class="{ typed: isClick, }"
-          src="/search_icon_top_search_field_clicked.svg"
-        >
+  <div class="topSearchWholeContainer">
+    <div class="topSearchContainer" :class="{ typed: isType}">
+      <div class="topSearchBarContainer">
+        <input
+          class="topSearchBarInput"
+          :class="{ typed: isType}"
+          :placeholder="placeholder"
+          v-model="inputText"
+          @input="inputChange"
+          @keydown="inputKeyDown"
+        />
+        <div class="topCross">
+          <img
+            class="topCrossImgNormal"
+            :class="{ typed: isType2}"
+            src="/delete_icon_top search_field_normal.svg"
+            @click="crossClick"
+          />
+          <img class="topCrossImgClicked" src="/delete_icon_top search_field_clicked.svg" />
+        </div>
+        <div class="topMagnifier">
+          <img
+            class="topMagnifierImgNormal"
+            :class="{ typed: isClick}"
+            src="/search_icon_top_search_field_normal.svg"
+            @click="magnifierClick"
+          />
+          <img
+            class="topMagnifierImgClicked"
+            :class="{ typed: isClick}"
+            src="/search_icon_top_search_field_clicked.svg"
+          />
+        </div>
       </div>
     </div>
     <div class="topAutocompleteContainer" :class="{ typed: isType, }">
@@ -52,35 +50,22 @@
 
 <script>
 export default {
+  props: {
+    autocomplete_data: {
+      type: Object
+    },
+    placeholder: {
+      type: String,
+      default: "Search for brand, style...etc"
+    }
+  },
   data: function() {
     return {
       isType: false,
+      isType2: false, // isType2 is for the cross icon only
       isClick: false,
       inputText: "",
-      placeholder: "Search for brand, style...etc",
-      selectedState: {},
-      autocomplete_data: {
-        fakeData_1: {
-          id: "item_1",
-          content: "apple"
-        },
-        fakeData_2: {
-          id: "item_2",
-          content: "apple farmer"
-        },
-        fakeData_3: {
-          id: "item_3",
-          content: "apple is delicious"
-        },
-        fakeData_4: {
-          id: "item_4",
-          content: "apple apple apple!"
-        },
-        fakeData_5: {
-          id: "item_5",
-          content: "apple can save your life"
-        }
-      }
+      selectedState: {}
     };
   },
   methods: {
@@ -88,9 +73,11 @@ export default {
       if (item.target.value !== "") {
         if (!this.isType) {
           this.isType = true;
+          this.isType2 = true;
         }
       } else if (this.isType) {
         this.isType = false;
+        this.isType2 = false;
       }
 
       for (var auto_item in this.autocomplete_data) {
@@ -172,12 +159,15 @@ export default {
     onSearch: function() {
       console.log("on search!");
       this.isType = false;
+      this.isClick = false;
     },
     crossClick: function(item) {
       this.inputText = "";
       this.isType = false;
+      this.isType2 = false;
     },
     magnifierClick: function() {
+      this.isClick = true;
       this.onSearch();
     }
   }
@@ -185,30 +175,28 @@ export default {
 </script>
 
 <style>
-.topSearchContainer {
-  width: 1890px;
-  height: 120px;
-  box-shadow: 0 10px 14px 1px rgba(0, 0, 0, 0.25);
-  background-color: #ffffff;
+.topSearchWholeContainer {
+  margin: 0 auto;
+  position: relative;
 }
 
-.topSearchContainer.typed {
-  width: 1890px;
-  height: auto;
+.topSearchContainer {
+  width: 100%;
   box-shadow: 0 10px 14px 1px rgba(0, 0, 0, 0.25);
   background-color: #ffffff;
 }
 
 .topSearchBarContainer {
-  width: 1410px;
-  height: 85px;
+  max-width: 74.6%;
+  height: 120px;
   display: flex;
   margin-left: auto;
   margin-right: auto;
 }
 
 .topSearchBarInput {
-  width: 1300px;
+  width: 88%;
+  height: 85px;
   font-family: Muli;
   font-size: 28px;
   font-weight: normal;
@@ -219,69 +207,71 @@ export default {
   color: #5f5f5f;
   border: none;
   border-bottom: solid 1px #d2af2c;
-  padding: 13px 0 14px 25px;
   outline: none;
 }
 
-::placeholder {
-  color: #e6e6e6;
-}
-
-.topSearchBarInput.typed {
-  color: #5f5f5f;
+.topSearchBarInput::placeholder {
+  font-family: Muli;
+  font-size: 28px;
+  font-weight: normal;
+  font-style: normal;
+  font-stretch: normal;
+  line-height: normal;
+  letter-spacing: normal;
+  opacity: 0.4;
 }
 
 .topCross {
+  width: 6%;
+  height: 85px;
   border: none;
   border-bottom: solid 1px #d2af2c;
   cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.topCrossImgNormal {
-  padding: 29px 20px 0 20px;
-}
-
-.topCrossImgNormal.typed {
+.topCrossImgNormal:not(.typed) {
   display: none;
 }
 
-.topCrossImgClicked {
-  padding: 29px 20px 0 20px;
+.topCrossImgNormal.clicked {
+  display: none;
 }
 
-.topCrossImgClicked:not(.typed) {
+.topCrossImgClicked:not(.clicked) {
   display: none;
 }
 
 .topMagnifier {
-  width: 72px;
+  width: 6%;
+  height: 85px;
   border: none;
   border-bottom: solid 1px #d2af2c;
   cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.topMagnifierImgNormal {
-  padding: 25px 0 0 25px;
-}
-
-.topMagnifierImgNormal.typed {
+.topMagnifierImgNormal.clicked {
   display: none;
 }
 
-.topMagnifierImgClicked {
-  padding: 25px 20px 0 20px;
-}
-
-.topMagnifierImgClicked:not(.typed) {
+.topMagnifierImgClicked:not(.clicked) {
   display: none;
 }
 
 .topAutocompleteContainer {
-  width: 1410px;
-  margin-left: auto;
-  margin-right: auto;
+  margin: 0 auto;
+  width: 100%;
+  height: auto;
+  box-shadow: 0 10px 14px 1px rgba(0, 0, 0, 0.25);
   background-color: #ffffff;
-  padding: 30px 0 65px;
+  padding-bottom: 4%;
+  position: absolute;
+  z-index: 1;
 }
 
 .topAutocompleteContainer:not(.typed) {
@@ -289,9 +279,8 @@ export default {
 }
 
 .topAutoCompListItem {
-  padding-top: 15px;
-  padding-left: 25px;
-  padding-bottom: 15px;
+  padding-top: 2%;
+  padding-bottom: 2%;
   font-family: Muli;
   font-size: 28px;
   font-weight: normal;
@@ -301,6 +290,7 @@ export default {
   letter-spacing: normal;
   color: #5f5f5f;
   cursor: pointer;
+  padding-left: 13%;
 }
 
 .topAutoCompListItem.selected {
