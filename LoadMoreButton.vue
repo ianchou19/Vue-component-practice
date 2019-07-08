@@ -44,5 +44,6 @@ export default {
   line-height: normal;
   letter-spacing: 0.72px;
   text-align: center;
+  cursor: pointer;
 }
 </style>
