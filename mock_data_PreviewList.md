@@ -146,7 +146,7 @@
             },
             {
                 "columnType": "button",
-                "title": "",
+                "title": "test",
                 "data": {
                     "buttonText": "VISIT"
                 },
